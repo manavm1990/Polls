@@ -9,7 +9,7 @@ User = get_user_model()
 
 
 class UserDetailView(LoginRequiredMixin, DetailView):
-    model = User
+    model: type[User] = User
     slug_field = "username"
     slug_url_kwarg = "username"
 
@@ -18,7 +18,7 @@ user_detail_view = UserDetailView.as_view()
 
 
 class UserUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
-    model = User
+    model: type[User] = User
     fields = ["name"]
     success_message = _("Information successfully updated")
 
@@ -28,7 +28,7 @@ class UserUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
         )  # for mypy to know that the user is authenticated
         return self.request.user.get_absolute_url()
 
-    def get_object(self):
+    def get_object(self, **kwargs):
         return self.request.user
 
 
