@@ -1,4 +1,6 @@
-#!/usr/bin/env python
+# Command-line utility for administrative tasks.
+
+# !/usr/bin/env python
 import os
 import sys
 from pathlib import Path
