@@ -27,7 +27,7 @@ CACHES = {
         "LOCATION": env("REDIS_URL"),
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            # Mimicing memcache behavior.
+            # Mimicking memcache behavior.
             # https://github.com/jazzband/django-redis#memcached-exceptions-behavior
             "IGNORE_EXCEPTIONS": True,
         },
@@ -97,7 +97,6 @@ ANYMAIL = {
     "SENDGRID_API_KEY": env("SENDGRID_API_KEY"),
     "SENDGRID_API_URL": env("SENDGRID_API_URL", default="https://api.sendgrid.com/v3/"),
 }
-
 
 # LOGGING
 # ------------------------------------------------------------------------------
