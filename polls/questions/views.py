@@ -17,6 +17,15 @@ class QuestionDetailView(DetailView):
 
     # TODO: Handle the case where the question doesn't exist.
     def render_to_response(self, context, **response_kwargs) -> JsonResponse:
+        # "Unexpected type(s):(str, bool)Possible type(s):(MultiValueDict[str, str], str)(MultiValueDict[str, str],
+        # str)"
+        # BS false positive from PyCharm 'Professional' edition. 🙄 https://youtrack.jetbrains.com/issue/PY-37457
+
+        # noinspection PyTypeChecker
+        include_results = (
+            self.request.GET.get("include_results", "").casefold() == "true"
+        )
+
         """Return a JSON response with the question and its choices."""
         question = self.object
 
@@ -29,6 +38,8 @@ class QuestionDetailView(DetailView):
                     {
                         "id": choice.id,
                         "text": choice.choice_text,
+                        # '**' is the spread operator in Python. It's like the '...' in JavaScript (with same caveats).
+                        **({"votes": choice.votes} if include_results else {}),
                     }
                     for choice in question.choice_set.all()
                 ],
