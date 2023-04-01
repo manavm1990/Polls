@@ -32,7 +32,6 @@ django-anymail = {extras = ["production"], version = "^9.1"}
 
 [tool.poetry.group.dev.dependencies]
 black = {extras = ["d"], version = "^23.1.0"}
-pre-commit = "^3.2.1"
 werkzeug = {extras = ["watchdog"], version = "^2.2.3"}
 ipdb = "^0.13.13"
 psycopg2 = "^2.9.5"
