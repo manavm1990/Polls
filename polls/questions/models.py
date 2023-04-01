@@ -8,7 +8,7 @@ class Question(models.Model):
     question_text = models.CharField(max_length=200)  # CharField requires a max_length
     pub_date = models.DateTimeField(
         "date published", auto_now_add=True
-    )  # Optional argument for human-readable name
+    )  # This uses an optional argument for human-readable name
 
     def __str__(self):
         return self.question_text
@@ -28,7 +28,9 @@ class Question(models.Model):
 
 
 class Choice(models.Model):
-    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    question = models.ForeignKey(
+        Question, on_delete=models.CASCADE, related_name="choices"
+    )
     choice_text = models.CharField(max_length=200)
     votes = models.IntegerField(default=0)
 
