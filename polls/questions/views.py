@@ -1,5 +1,7 @@
 from rest_framework.response import Response
 
+from ..utils.exceptions import ResourceNotFoundException
+
 # '..' is akin to '../' in a file system
 from ..utils.views import UnauthenticatedAPIView
 from .models import Question
@@ -9,11 +11,14 @@ class QuestionAPIView(UnauthenticatedAPIView):
     # TODO: Consider removing @staticmethod
     @staticmethod
     def get(request, question_id, *args, **kwargs):
+        """Show a single question and its choices. Optionally include the number of votes for each choice."""
+
         try:
             question = Question.objects.get(id=question_id)
         except Question.DoesNotExist:
-            # TODO: Use a custom exception class
-            return Response({"error": "Question not found"}, status=404)
+            raise ResourceNotFoundException(
+                model_name="Question", requested_id=question_id
+            )
 
         include_results = request.GET.get("include_results", "").casefold() == "true"
 
