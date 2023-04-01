@@ -5,6 +5,7 @@ from ..utils.exceptions import ResourceNotFoundException
 # '..' is akin to '../' in a file system
 from ..views import UnauthenticatedAPIView
 from .models import Question
+from .serializers import QuestionSerializer
 
 
 class QuestionAPIView(UnauthenticatedAPIView):
@@ -19,24 +20,8 @@ class QuestionAPIView(UnauthenticatedAPIView):
                 model_name="Question", requested_id=question_id
             )
 
-        include_results = request.GET.get("include_results", "").casefold() == "true"
-
-        response_data = {
-            "id": question.id,
-            "text": question.question_text,
-            "pub_date": question.pub_date,
-            "choices": [
-                {
-                    "id": choice.id,
-                    "text": choice.choice_text,
-                    **({"votes": choice.votes} if include_results else {}),
-                }
-                for choice in question.choice_set.all()
-            ],
-        }
-
         # Use `Response` instead of `JsonResponse` for numerous DRF benefits even if just working with JSON
-        return Response(response_data)
+        return Response(QuestionSerializer(question).data)
 
 
 question_api_view = QuestionAPIView.as_view()
