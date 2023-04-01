@@ -33,7 +33,9 @@ class QuestionListAPIView(UnauthenticatedAPIView, ListAPIView):
     queryset = Question.objects.all()
     serializer_class = QuestionSerializer
 
+    # Ensure that a fresh queryset is used for each request (no caching stuff).
     def get_queryset(self):
+        # Create a new queryset based on the original for the class ☝️.
         return self.queryset.all()
 
     def get(self, request, *args, **kwargs):
