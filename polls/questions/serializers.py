@@ -14,4 +14,9 @@ class QuestionSerializer(ModelSerializer):
 
     class Meta:
         model = Question
-        fields = ["id", "question_text", "pub_date", "choices"]
+        fields = [
+            "id",
+            "question_text",
+            "pub_date",
+            "choices",
+        ]  # 'choices' is the 'related_name' from the Choice model
