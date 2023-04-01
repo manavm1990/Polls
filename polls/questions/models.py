@@ -21,6 +21,11 @@ class Question(models.Model):
     def was_published_recently(self):
         return self.pub_date >= timezone.now() - datetime.timedelta(days=1)
 
+    class Meta:
+        ordering = ["-pub_date"]
+        verbose_name = "Question"
+        verbose_name_plural = "Questions"
+
 
 class Choice(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
