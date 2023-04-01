@@ -1,6 +1,6 @@
-from rest_framework.views import APIView
+from rest_framework.generics import RetrieveAPIView
 
 
-class UnauthenticatedAPIView(APIView):
+class UnauthenticatedRetrieveAPIView(RetrieveAPIView):
     authentication_classes = []  # Disable authentication
     permission_classes = []  # Disable permission checks

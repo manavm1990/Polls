@@ -1,30 +1,30 @@
 from rest_framework.response import Response
 
 from ..utils.exceptions import ResourceNotFoundException
-
-# '..' is akin to '../' in a file system
-from ..views import UnauthenticatedAPIView
+from ..views import UnauthenticatedRetrieveAPIView
 from .models import Question
 from .serializers import QuestionSerializer
 
 
-class QuestionAPIView(UnauthenticatedAPIView):
-    @staticmethod
-    def get(request, question_id, *args, **kwargs):
+class QuestionRetrieveAPIView(UnauthenticatedRetrieveAPIView):
+    queryset = Question.objects.all()
+    serializer_class = QuestionSerializer
+    lookup_url_kwarg = "question_id"
+
+    def get(self, request, *args, **kwargs):
         """Show a single question and its choices. Optionally include the number of votes for each choice."""
+        include_results = request.GET.get("include_votes", "").casefold() == "true"
         try:
-            question = Question.objects.get(id=question_id)
+            super().get(request, *args, **kwargs)
         except Question.DoesNotExist:
             raise ResourceNotFoundException(
-                model_name="Question", requested_id=question_id
+                model_name="Question", requested_id=kwargs["question_id"]
             )
 
-        include_results = request.GET.get("include_votes", "").casefold() == "true"
-        return Response(
-            QuestionSerializer(
-                question, context={"include_votes": include_results}
-            ).data
+        serializer = QuestionSerializer(
+            self.get_object(), context={"include_votes": include_results}
         )
+        return Response(serializer.data)
 
 
-question_api_view = QuestionAPIView.as_view()
+question_retrieve_api_view = QuestionRetrieveAPIView.as_view()
