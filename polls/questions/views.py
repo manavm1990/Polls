@@ -3,12 +3,11 @@ from rest_framework.response import Response
 from ..utils.exceptions import ResourceNotFoundException
 
 # '..' is akin to '../' in a file system
-from ..utils.views import UnauthenticatedAPIView
+from ..views import UnauthenticatedAPIView
 from .models import Question
 
 
 class QuestionAPIView(UnauthenticatedAPIView):
-    # TODO: Consider removing @staticmethod
     @staticmethod
     def get(request, question_id, *args, **kwargs):
         """Show a single question and its choices. Optionally include the number of votes for each choice."""
