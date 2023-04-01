@@ -51,6 +51,7 @@ django-debug-toolbar = "^3.8.1"
 django-extensions = "^3.2.1"
 django-coverage-plugin = "^3.0.0"
 pytest-django = "^4.5.2"
+pre-commit = "^3.2.1"
 
 [build-system]
 requires = ["poetry-core"]
