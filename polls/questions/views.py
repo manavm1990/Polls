@@ -1,4 +1,5 @@
 from django.http import JsonResponse
+
 # The DetailView automatically 🪄 handles the logic for fetching from the database based on the primary key in the URL.
 from django.views.generic import DetailView
 
@@ -28,7 +29,6 @@ class QuestionDetailView(DetailView):
                     {
                         "id": choice.id,
                         "text": choice.choice_text,
-                        "votes": choice.votes,
                     }
                     for choice in question.choice_set.all()
                 ],
