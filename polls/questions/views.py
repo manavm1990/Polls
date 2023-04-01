@@ -1,50 +1,38 @@
-from django.http import JsonResponse
+from rest_framework.response import Response
 
-# The DetailView automatically 🪄 handles the logic for fetching from the database based on the primary key in the URL.
-from django.views.generic import DetailView
-
+# '..' is akin to '../' in a file system
+from ..utils.views import UnauthenticatedAPIView
 from .models import Question
 
 
-class QuestionDetailView(DetailView):
-    model: type[Question] = Question
+class QuestionAPIView(UnauthenticatedAPIView):
+    # TODO: Consider removing @staticmethod
+    @staticmethod
+    def get(request, question_id, *args, **kwargs):
+        try:
+            question = Question.objects.get(id=question_id)
+        except Question.DoesNotExist:
+            # TODO: Use a custom exception class
+            return Response({"error": "Question not found"}, status=404)
 
-    # This is the column in the database for the lookup.
-    slug_field = "id"
+        include_results = request.GET.get("include_results", "").casefold() == "true"
 
-    # This is the name of the URL parameter that contains the lookup value.
-    slug_url_kwarg = "question_id"
+        response_data = {
+            "id": question.id,
+            "text": question.question_text,
+            "pub_date": question.pub_date,
+            "choices": [
+                {
+                    "id": choice.id,
+                    "text": choice.choice_text,
+                    **({"votes": choice.votes} if include_results else {}),
+                }
+                for choice in question.choice_set.all()
+            ],
+        }
 
-    # TODO: Handle the case where the question doesn't exist.
-    def render_to_response(self, context, **response_kwargs) -> JsonResponse:
-        # "Unexpected type(s):(str, bool)Possible type(s):(MultiValueDict[str, str], str)(MultiValueDict[str, str],
-        # str)"
-        # BS false positive from PyCharm 'Professional' edition. 🙄 https://youtrack.jetbrains.com/issue/PY-37457
-
-        # noinspection PyTypeChecker
-        include_results = (
-            self.request.GET.get("include_results", "").casefold() == "true"
-        )
-
-        """Return a JSON response with the question and its choices."""
-        question = self.object
-
-        return JsonResponse(
-            {
-                "id": question.id,
-                "text": question.question_text,
-                "pub_date": question.pub_date,
-                "choices": [
-                    {
-                        "id": choice.id,
-                        "text": choice.choice_text,
-                        # '**' is the spread operator in Python. It's like the '...' in JavaScript (with same caveats).
-                        **({"votes": choice.votes} if include_results else {}),
-                    }
-                    for choice in question.choice_set.all()
-                ],
-            }
-        )
+        # Use `Response` instead of `JsonResponse` for numerous DRF benefits even if just working with JSON
+        return Response(response_data)
 
 
-question_detail_view = QuestionDetailView.as_view()
+question_api_view = QuestionAPIView.as_view()
