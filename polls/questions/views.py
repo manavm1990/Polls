@@ -1,5 +1,4 @@
 from rest_framework.generics import ListAPIView, RetrieveAPIView
-from rest_framework.response import Response
 
 from ..utils.exceptions import ResourceNotFoundException
 from ..views import UnauthenticatedAPIView
@@ -21,29 +20,27 @@ class QuestionRetrieveAPIView(UnauthenticatedAPIView, RetrieveAPIView):
                 model_name="Question", requested_id=question_id
             )
 
-    def get(self, request, *args, **kwargs):
-        include_votes = request.GET.get("include_votes", "").casefold() == "true"
-        serializer = QuestionSerializer(
-            self.get_object(), context={"include_votes": include_votes}
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["include_votes"] = (
+            self.request.GET.get("include_votes", "").casefold() == "true"
         )
-        return Response(serializer.data)
+        return context
 
 
 class QuestionListAPIView(UnauthenticatedAPIView, ListAPIView):
     queryset = Question.objects.all()
     serializer_class = QuestionSerializer
 
-    # Ensure that a fresh queryset is used for each request (no caching stuff).
     def get_queryset(self):
-        # Create a new queryset based on the original for the class ☝️.
         return self.queryset.all()
 
-    def get(self, request, *args, **kwargs):
-        include_votes = request.GET.get("include_votes", "").casefold() == "true"
-        serializer = QuestionSerializer(
-            self.get_queryset(), many=True, context={"include_votes": include_votes}
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["include_votes"] = (
+            self.request.GET.get("include_votes", "").casefold() == "true"
         )
-        return Response(serializer.data)
+        return context
 
 
 question_retrieve_api_view = QuestionRetrieveAPIView.as_view()
