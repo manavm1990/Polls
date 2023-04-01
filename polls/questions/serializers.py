@@ -10,8 +10,8 @@ class ChoiceSerializer(ModelSerializer):
 
     def to_representation(self, instance):
         rep = super().to_representation(instance)
-        include_results = self.context.get("include_votes", False)
-        if not include_results:
+        include_votes = self.context.get("include_votes", False)
+        if not include_votes:
             rep.pop("votes")
         return rep
 

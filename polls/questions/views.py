@@ -13,7 +13,7 @@ class QuestionRetrieveAPIView(UnauthenticatedRetrieveAPIView):
 
     def get(self, request, *args, **kwargs):
         """Show a single question and its choices. Optionally include the number of votes for each choice."""
-        include_results = request.GET.get("include_votes", "").casefold() == "true"
+        include_votes = request.GET.get("include_votes", "").casefold() == "true"
         try:
             super().get(request, *args, **kwargs)
         except Question.DoesNotExist:
@@ -22,7 +22,7 @@ class QuestionRetrieveAPIView(UnauthenticatedRetrieveAPIView):
             )
 
         serializer = QuestionSerializer(
-            self.get_object(), context={"include_votes": include_results}
+            self.get_object(), context={"include_votes": include_votes}
         )
         return Response(serializer.data)
 
