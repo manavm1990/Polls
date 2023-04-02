@@ -1,6 +1,6 @@
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 
-from ..utils.exceptions import ResourceNotFoundException
+from ..utils.exceptions_handlers import ResourceNotFoundException
 from ..views import UnauthenticatedAPIView
 from .models import Question
 from .serializers import QuestionSerializer
