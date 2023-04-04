@@ -17,7 +17,6 @@ urlpatterns = [
     # User management
     path("users/", include("polls.users.urls", namespace="users")),
     path("accounts/", include("allauth.urls")),
-    path("questions/", include("polls.questions.urls", namespace="questions")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # API URLS
@@ -32,6 +31,8 @@ urlpatterns += [
         SpectacularSwaggerView.as_view(url_name="api-schema"),
         name="api-docs",
     ),
+    # Questions
+    path("api/questions/", include("polls.questions.urls", namespace="questions")),
 ]
 
 if settings.DEBUG:
