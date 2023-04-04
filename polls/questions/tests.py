@@ -3,6 +3,7 @@ from contextlib import contextmanager
 
 import pytest
 from django.db import models
+from django.db.models import DateTimeField
 from django.utils import timezone
 
 from .models import Question
@@ -29,7 +30,9 @@ def remove_auto_now_add(model_field: type[models.DateTimeField]):
 @pytest.mark.django_db
 @pytest.fixture
 def old_question(db):
-    with remove_auto_now_add(Question._meta.get_field("pub_date")):
+    # Supposedly we HAVE TO use 'noqa' here to satisfy PyCharm, etc.
+    pub_date_field: type[DateTimeField] = Question._meta.get_field("pub_date")  # noqa
+    with remove_auto_now_add(pub_date_field):
         old_question = Question.objects.create(
             question_text="What's up?",
             pub_date=timezone.now() - datetime.timedelta(days=2),
