@@ -277,6 +277,7 @@ REST_FRAMEWORK = {
     ),
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "EXCEPTION_HANDLER": "polls.utils.exceptions.handle_exception",
 }
 
 # django-cors-headers - https://github.com/adamchainz/django-cors-headers#setup
