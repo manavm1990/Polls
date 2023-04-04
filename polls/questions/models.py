@@ -26,6 +26,13 @@ class Question(models.Model):
     def was_published_recently(self) -> bool:
         return self.pub_date >= timezone.now() - datetime.timedelta(days=1)
 
+    def save(self, *args, **kwargs):
+        """Override the save method to set the pub_date to the original value if the object is being updated."""
+        if self.pk:  # If the object has a primary key, it's being updated
+            original_obj = Question.objects.get(pk=self.pk)
+            self.pub_date = original_obj.pub_date  # Set pub_date to the original value
+        super().save(*args, **kwargs)
+
     class Meta:
         ordering = ["-pub_date"]
         verbose_name = "Question"
