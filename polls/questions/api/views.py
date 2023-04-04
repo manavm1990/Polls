@@ -1,12 +1,12 @@
-from rest_framework.generics import ListAPIView, RetrieveAPIView
+from rest_framework import viewsets
 
-from polls.questions.api.serializers import QuestionSerializer
-from polls.questions.models import Question
-from polls.utils.exception_handlers import ResourceNotFoundException
-from polls.views import UnauthenticatedAPIView
+from ...utils.exception_handlers import ResourceNotFoundException
+from ...views import UnauthenticatedAPIView
+from ..models import Question
+from .serializers import QuestionSerializer
 
 
-class QuestionRetrieveAPIView(UnauthenticatedAPIView, RetrieveAPIView):
+class QuestionViewSet(UnauthenticatedAPIView, viewsets.ReadOnlyModelViewSet):
     queryset = Question.objects.all()
     serializer_class = QuestionSerializer
     lookup_url_kwarg = "question_id"
@@ -26,22 +26,3 @@ class QuestionRetrieveAPIView(UnauthenticatedAPIView, RetrieveAPIView):
             self.request.GET.get("include_votes", "").casefold() == "true"
         )
         return context
-
-
-class QuestionListAPIView(UnauthenticatedAPIView, ListAPIView):
-    queryset = Question.objects.all()
-    serializer_class = QuestionSerializer
-
-    def get_queryset(self):
-        return self.queryset.all()
-
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-        context["include_votes"] = (
-            self.request.GET.get("include_votes", "").casefold() == "true"
-        )
-        return context
-
-
-question_retrieve_api_view = QuestionRetrieveAPIView.as_view()
-question_list_api_view = QuestionListAPIView.as_view()
