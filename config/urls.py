@@ -31,8 +31,6 @@ urlpatterns += [
         SpectacularSwaggerView.as_view(url_name="api-schema"),
         name="api-docs",
     ),
-    # Questions
-    path("api/questions/", include("polls.questions.urls", namespace="questions")),
 ]
 
 if settings.DEBUG:
