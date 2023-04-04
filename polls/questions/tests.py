@@ -1,4 +1,9 @@
+import datetime
+from contextlib import contextmanager
+
 import pytest
+from django.db import models
+from django.utils import timezone
 
 from .models import Question
 
@@ -12,7 +17,35 @@ def question(db):
     return question
 
 
+@contextmanager
+def remove_auto_now_add(model_field: type[models.DateTimeField]):
+    """Context manager to temporarily remove auto_now_add from a model field for tests."""
+    auto_now_add = model_field.auto_now_add
+    model_field.auto_now_add = False
+    yield
+    model_field.auto_now_add = auto_now_add
+
+
+@pytest.mark.django_db
+@pytest.fixture
+def old_question(db):
+    with remove_auto_now_add(Question._meta.get_field("pub_date")):
+        old_question = Question.objects.create(
+            question_text="What's up?",
+            pub_date=timezone.now() - datetime.timedelta(days=2),
+        )
+    return old_question
+
+
 def test_pub_date_is_read_only(question):
     question.pub_date = "2020-01-01"
     question.save()
     assert question.pub_date != "2020-01-01"
+
+
+def test_was_published_recently(question):
+    assert question.was_published_recently is True
+
+
+def test_was_not_published_recently_with_old_question(old_question):
+    assert old_question.was_published_recently is False
