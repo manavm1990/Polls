@@ -1,9 +1,9 @@
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 
-from ..utils.exception_handlers import ResourceNotFoundException
-from ..views import UnauthenticatedAPIView
-from .models import Question
-from .serializers import QuestionSerializer
+from polls.questions.api.serializers import QuestionSerializer
+from polls.questions.models import Question
+from polls.utils.exception_handlers import ResourceNotFoundException
+from polls.views import UnauthenticatedAPIView
 
 
 class QuestionRetrieveAPIView(UnauthenticatedAPIView, RetrieveAPIView):

@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import question_list_api_view, question_retrieve_api_view
+from polls.questions.api.views import question_list_api_view, question_retrieve_api_view
 
 app_name = "questions_api"
 urlpatterns = [
