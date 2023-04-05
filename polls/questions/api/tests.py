@@ -46,6 +46,21 @@ class QuestionViewSetTestCase(TestCase):
         self.assertEqual(response_pub_dates, sorted(response_pub_dates, reverse=True))
         return response.data
 
+    def check_question_attributes(self, question_data, question):
+        self.assertEqual(question_data["id"], question.id)
+        self.assertEqual(question_data["question_text"], question.question_text)
+
+        response_pub_date = parse_datetime(question_data["pub_date"]).astimezone(UTC)
+        question_pub_date = question.pub_date.astimezone(UTC)
+        self.assertAlmostEqual(response_pub_date, question_pub_date)
+
+    def check_choice_attributes(self, choice_data, choice, include_votes):
+        self.assertEqual(choice_data["choice_text"], choice.choice_text)
+        self.assertEqual("votes" in choice_data, include_votes)
+
+        if include_votes:
+            self.assertEqual(choice_data["votes"], choice.votes)
+
     def check_question_data(self, params):
         """
         Check the question data in the response against the given question.
@@ -60,22 +75,12 @@ class QuestionViewSetTestCase(TestCase):
         choices_count = params["choices_count"]
         include_votes = params["include_votes"]
 
-        self.assertEqual(question_data["id"], question.id)
-        self.assertEqual(question_data["question_text"], question.question_text)
-
-        response_pub_date = parse_datetime(question_data["pub_date"]).astimezone(UTC)
-        question_pub_date = question.pub_date.astimezone(UTC)
-        self.assertAlmostEqual(response_pub_date, question_pub_date)
-
+        self.check_question_attributes(question_data, question)
         self.assertEqual(len(question_data["choices"]), choices_count)
 
         for choice_data in question_data["choices"]:
             choice = Choice.objects.get(id=choice_data["id"])
-            self.assertEqual(choice_data["choice_text"], choice.choice_text)
-
-            self.assertEqual("votes" in choice_data, include_votes)
-            if include_votes:
-                self.assertEqual(choice_data["votes"], choice.votes)
+            self.check_choice_attributes(choice_data, choice, include_votes)
 
     def test_list_questions(self):
         """Test the list request without including votes."""
