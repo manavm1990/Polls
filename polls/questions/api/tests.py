@@ -28,6 +28,12 @@ class QuestionViewSetTestCase(TestCase):
         view = QuestionViewSet.as_view({"get": "list"})
         return view(request)
 
+    def execute_retrieve_request(self, question_id, params=None):
+        """Execute the retrieve request on the QuestionViewSet with optional parameters."""
+        request = self.factory.get(f"/api/questions/{question_id}/", data=params)
+        view = QuestionViewSet.as_view({"get": "retrieve"})
+        return view(request, question_id=question_id)
+
     def check_response_common(self, response):
         """Check the common response attributes for the list request."""
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -122,5 +128,39 @@ class QuestionViewSetTestCase(TestCase):
                 "question": self.question2,
                 "choices_count": 0,
                 "include_votes": False,
+            }
+        )
+
+    def test_retrieve_question(self):
+        """Test the retrieve request without including votes."""
+        response = self.execute_retrieve_request(self.question1.id)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Test question1 data
+        self.check_question_data(
+            {
+                "question_data": response.data,
+                "question": self.question1,
+                "choices_count": 2,
+                "include_votes": False,
+            }
+        )
+
+    def test_retrieve_question_with_votes(self):
+        """Test the retrieve request including votes."""
+        response = self.execute_retrieve_request(
+            self.question1.id, params={"include_votes": "true"}
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Test question1 data
+        self.check_question_data(
+            {
+                "question_data": response.data,
+                "question": self.question1,
+                "choices_count": 2,
+                "include_votes": True,
             }
         )
