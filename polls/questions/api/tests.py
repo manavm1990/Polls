@@ -34,7 +34,7 @@ class QuestionViewSetTestCase(TestCase):
         view = QuestionViewSet.as_view({"get": "retrieve"})
         return view(request, question_id=question_id)
 
-    def check_response_common(self, response):
+    def check_list_response_common(self, response):
         """Check the common response attributes for the list request."""
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 2)
@@ -80,7 +80,7 @@ class QuestionViewSetTestCase(TestCase):
     def test_list_questions(self):
         """Test the list request without including votes."""
         response = self.execute_list_request()
-        response_data = self.check_response_common(response)
+        response_data = self.check_list_response_common(response)
 
         # Test question1 data
         question1_data = response_data[1]  # The question with the older pub_date
@@ -107,7 +107,7 @@ class QuestionViewSetTestCase(TestCase):
     def test_list_questions_with_votes(self):
         """Test the list request including votes."""
         response = self.execute_list_request(params={"include_votes": "true"})
-        response_data = self.check_response_common(response)
+        response_data = self.check_list_response_common(response)
 
         # Test question1 data
         question1_data = response_data[1]  # The question with the older pub_date
