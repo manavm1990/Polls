@@ -40,40 +40,20 @@ class QuestionViewSetTestCase(TestCase):
         self.assertEqual(response_pub_dates, sorted(response_pub_dates, reverse=True))
         return response.data
 
-    def test_list_questions(self):
-        """Test the list request without including votes."""
-        response = self.execute_list_request(None)
-        response_data = self.check_response_common(response)
+    def check_question_data(self, params):
+        """
+        Check the question data in the response against the given question.
+        Params:
+            - question_data: dict, question data in the response
+            - question: Question, the expected question object
+            - choices_count: int, number of expected choices
+            - include_votes: bool, whether votes should be included in the response
+        """
+        question_data = params["question_data"]
+        question = params["question"]
+        choices_count = params["choices_count"]
+        include_votes = params["include_votes"]
 
-        # Test question1 data
-        question1_data = response_data[1]  # The question with the older pub_date
-        self.check_question_data(question1_data, self.question1, 2, include_votes=False)
-
-        # Test question2 data
-        question2_data = response_data[0]  # The question with the latest pub_date
-        self.check_question_data(question2_data, self.question2, 0, include_votes=False)
-
-    def test_list_questions_with_votes(self):
-        """Test the list request including votes."""
-        response = self.execute_list_request(params={"include_votes": "true"})
-        response_data = self.check_response_common(response)
-
-        # Test question1 data
-        question1_data = response_data[1]  # The question with the older pub_date
-        self.check_question_data(question1_data, self.question1, 2, include_votes=True)
-
-        # Test question2 data
-        question2_data = response_data[0]  # The question with the latest pub_date
-        self.check_question_data(question2_data, self.question2, 0, include_votes=True)
-
-    def check_question_data(
-        self,
-        question_data,
-        question,
-        choices_count,
-        include_votes,
-    ):
-        """Check the question data in the response against the given question."""
         self.assertEqual(question_data["id"], question.id)
         self.assertEqual(question_data["question_text"], question.question_text)
 
@@ -90,3 +70,57 @@ class QuestionViewSetTestCase(TestCase):
             self.assertEqual("votes" in choice_data, include_votes)
             if include_votes:
                 self.assertEqual(choice_data["votes"], choice.votes)
+
+    def test_list_questions(self):
+        """Test the list request without including votes."""
+        response = self.execute_list_request(None)
+        response_data = self.check_response_common(response)
+
+        # Test question1 data
+        question1_data = response_data[1]  # The question with the older pub_date
+        self.check_question_data(
+            {
+                "question_data": question1_data,
+                "question": self.question1,
+                "choices_count": 2,
+                "include_votes": False,
+            }
+        )
+
+        # Test question2 data
+        question2_data = response_data[0]  # The question with the latest pub_date
+        self.check_question_data(
+            {
+                "question_data": question2_data,
+                "question": self.question2,
+                "choices_count": 0,
+                "include_votes": False,
+            }
+        )
+
+    def test_list_questions_with_votes(self):
+        """Test the list request including votes."""
+        response = self.execute_list_request(params={"include_votes": "true"})
+        response_data = self.check_response_common(response)
+
+        # Test question1 data
+        question1_data = response_data[1]  # The question with the older pub_date
+        self.check_question_data(
+            {
+                "question_data": question1_data,
+                "question": self.question1,
+                "choices_count": 2,
+                "include_votes": True,
+            }
+        )
+
+        # Test question2 data
+        question2_data = response_data[0]  # The question with the latest pub_date
+        self.check_question_data(
+            {
+                "question_data": question2_data,
+                "question": self.question2,
+                "choices_count": 0,
+                "include_votes": False,
+            }
+        )
