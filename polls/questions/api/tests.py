@@ -22,7 +22,7 @@ class QuestionViewSetTestCase(TestCase):
             question=self.question1, choice_text="Choice 2", votes=3
         )
 
-    def execute_list_request(self, params):
+    def execute_list_request(self, params=None):
         """Execute the list request on the QuestionViewSet with optional parameters."""
         request = self.factory.get("/api/questions/", data=params)
         view = QuestionViewSet.as_view({"get": "list"})
@@ -73,7 +73,7 @@ class QuestionViewSetTestCase(TestCase):
 
     def test_list_questions(self):
         """Test the list request without including votes."""
-        response = self.execute_list_request(None)
+        response = self.execute_list_request()
         response_data = self.check_response_common(response)
 
         # Test question1 data
